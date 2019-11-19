@@ -17,6 +17,7 @@ let playerScoreO = document.getElementById('playerScoreO')
 let xCounter = 0
 let oCounter = 0
 let gameCounter = 0
+let thinking = false
 
 let allSquares = ["sq1", "sq2", "sq3", "sq4", "sq5", "sq6", "sq7", "sq8", "sq9"]
 
@@ -29,7 +30,7 @@ const playXO = e => {
     //if first turn or the last player played o when clicked, play X image and tell O it is their turn
     if (trackPlays.length === 0 || trackPlays[trackPlays.length-1] === "o") {
         e.target.classList.add('xImage')
-        
+
         trackPlays.push('x')
         trackSquaresX.push(e.target.id)
 
@@ -37,13 +38,13 @@ const playXO = e => {
     }
     else {
         e.target.classList.add('oImage')
-        
+
         trackPlays.push('o')
         trackSquaresO.push(e.target.id)
 
         messageBoard.textContent = "TURKEY, it's your turn"
     }
-    
+
     //remove event listener
     e.target.removeEventListener('click', playXO)
 
@@ -51,11 +52,11 @@ const playXO = e => {
     if (checkWin(trackSquaresX)) {
         winGame('TURKEY', playXO)
         playerScoreX.textContent = xCounter += 1
-    } 
+    }
     else if (checkWin(trackSquaresO)) {
          winGame('PIE', playXO)
          playerScoreO.textContent = oCounter += 1
-    } 
+    }
     else if (trackPlays.length === 9 && (checkWin(trackSquaresX) === false && checkWin(trackSquaresO) === false)) {
         drawGame(playXO)
     }
@@ -75,7 +76,7 @@ const checkWin = (arr) => {
     //if sq3, sq5, sq7
        //Win - return true
     //else return false
-    
+
     switch(true) {
         case arr.includes('sq1') && arr.includes('sq2') && arr.includes('sq3'):
             return true
@@ -101,7 +102,7 @@ const checkWin = (arr) => {
         case arr.includes('sq3') && arr.includes('sq5') && arr.includes('sq7'):
             return true
             break
-        default:   
+        default:
             return false
         }
 }
@@ -127,14 +128,14 @@ const drawGame = (playXOorComp) => {
 
 //add and remove event listeners on squares (2pl and comp)
 const addSquareListeners = (playXOorComp) => {
-    
+
     for (let i = 0; i < squares.length; i++) {
         squares[i].addEventListener('click', playXOorComp)
     }
 }
 
 const removeSquareListeners = (playXOorComp) => {
-    
+
     for (let i = 0; i < squares.length; i++) {
         squares[i].removeEventListener('click', playXOorComp)
     }
@@ -215,7 +216,7 @@ const nextGame = () => {
     trackPlays = []
     trackSquaresX = []
     trackSquaresO = []
-    
+
     //reset squares and add event listeners back for 2pl game
     for (let i = 0; i < squares.length; i++) {
         squares[i].setAttribute('class', 'square')
@@ -225,11 +226,11 @@ const nextGame = () => {
 
 //reset board but keep track of score for COMP game
 const nextGameComp = () => {
-    //reset trackers    
+    //reset trackers
     trackPlays = []
     trackSquaresX = []
     trackSquaresO = []
- 
+
     //reset squares and add event listeners back for 2pl game
     for (let i = 0; i < squares.length; i++) {
         squares[i].setAttribute('class', 'square')
@@ -242,7 +243,7 @@ const chooseRandomSq = () => {
     let i = Math.floor(Math.random() * 9)
     if (trackSquaresX.includes(allSquares[i]) || trackSquaresO.includes(allSquares[i])) {
         return chooseRandomSq()
-    } 
+    }
     else {
         return allSquares[i]
     }
@@ -254,19 +255,21 @@ const didSomeoneWinComp = () =>{
     if (checkWin(trackSquaresX)) {
         winGame('TURKEY', playXOComp)
         playerScoreX.textContent = xCounter += 1
-    } 
+    }
     else if (checkWin(trackSquaresO)) {
          winGame('PIE', playXOComp)
          playerScoreO.textContent = oCounter += 1
-    } 
+    }
     else if (trackPlays.length === 9 && (checkWin(trackSquaresX) === false && checkWin(trackSquaresO) === false)) {
         drawGame(playXOComp)
     }
     //added call for computer to play here, because otherwise the other function would be waiting on a click
     else if (trackPlays[trackPlays.length-1] === "x") {
+        thinking = true
         setTimeout(playCompO, 2000)
     }
     else {
+        thinking = false
         messageBoard.textContent = "TURKEY, it's your turn"
     }
 }
@@ -276,7 +279,7 @@ const playCompO = () => {
         //runs random square function, finds that square and adds image to it
         let sqNum = chooseRandomSq()
         document.getElementById(sqNum).classList.add('oImage')
-        
+
         trackSquaresO.push(sqNum)
         trackPlays.push('o')
 
@@ -286,6 +289,8 @@ const playCompO = () => {
 
 
 const playXOComp = e => {
+    if (thinking) return false
+
     //reveal play again button and add event listener
     playAgainButton.style.display = "block"
     playAgainButton.addEventListener('click', nextGameComp)
@@ -298,7 +303,7 @@ const playXOComp = e => {
 
         messageBoard.textContent = "Player PIE is thinking..."
     }
-    
+
     //remove event listener
     e.target.removeEventListener('click', playXOComp)
 
@@ -315,7 +320,7 @@ const startCompGame = () => {
     xCounter = 0
     oCounter = 0
     gameCounter = 0
-    
+
     //add event listeners to trigger the computer mode play function
     addSquareListeners(playXOComp)
 
@@ -326,7 +331,7 @@ const startCompGame = () => {
     startCompButton.textContent = "Start Over"
     startCompButton.removeEventListener('click', startCompGame)
     startCompButton.addEventListener('click', startOver)
-    
+
     //hide start 2PL game button
     startButton.style.display = "none"
 
