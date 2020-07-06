@@ -297,6 +297,8 @@ const playXOComp = e => {
         trackSquaresX.push(e.target.id)
 
         messageBoard.textContent = "Player PIE is thinking..."
+        
+        //create boolean/while loop so that nothing is clickable while computer is playing
     }
     
     //remove event listener
@@ -342,3 +344,4 @@ document.addEventListener('DOMContentLoaded', () => {
     startButton.addEventListener('click', startGame)
     startCompButton.addEventListener('click', startCompGame)
 })
+
